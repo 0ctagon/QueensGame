@@ -6,12 +6,14 @@ from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 import matplotlib.image as mpimg
 import plothist
 
+
 def hex_to_color_name(hex_color):
     try:
         color_name = webcolors.hex_to_name(hex_color)
     except ValueError:
         color_name = hex_color[1:]
     return color_name
+
 
 class Queen:
     def __init__(self, row, col, _color=None):
@@ -23,6 +25,7 @@ class Queen:
     def __str__(self):
         return f"Queen on {self.coords}" + (f" | {self.color}" if self.color else "")
 
+
 class Cell:
     def __init__(self, row, col, color):
         self.row = row
@@ -33,7 +36,12 @@ class Cell:
         self.coords = (row, col)
 
     def __str__(self):
-        return f"Cell ({self.row}, {self.col})" + (" | F " if not self.busy else " | X ") + f"| {self.color}" + (f" - QUEEN" if self.queen else "")
+        return (
+            f"Cell ({self.row}, {self.col})"
+            + (" | F " if not self.busy else " | X ")
+            + f"| {self.color}"
+            + (f" - QUEEN" if self.queen else "")
+        )
 
     def __repr__(self):
         return f"({self.row}, {self.col})"
@@ -82,7 +90,7 @@ class Board:
         return new_board
 
     def read_board(self, yaml_file):
-        with open(yaml_file, 'r') as file:
+        with open(yaml_file, "r") as file:
             board_state = yaml.safe_load(file)
 
         for row in range(self.Nrows):
@@ -130,50 +138,84 @@ class Board:
                 if cell.queen:
                     print(f"\t{cell.queen}")
 
-
     def plot_board(self, output="board.png", with_cell_status=False):
         fig, ax = plt.subplots(figsize=(self.Ncols, self.Nrows))
         for row in self.cells:
             for cell in row:
-                ax.add_patch(patches.Rectangle((cell.col, cell.row), 1, 1, facecolor=cell.color, edgecolor='None'))
-                ax.add_patch(patches.Rectangle((cell.col, cell.row), 1, 1, facecolor="None", edgecolor='black', alpha=0.1))
+                ax.add_patch(
+                    patches.Rectangle(
+                        (cell.col, cell.row),
+                        1,
+                        1,
+                        facecolor=cell.color,
+                        edgecolor="None",
+                    )
+                )
+                ax.add_patch(
+                    patches.Rectangle(
+                        (cell.col, cell.row),
+                        1,
+                        1,
+                        facecolor="None",
+                        edgecolor="black",
+                        alpha=0.1,
+                    )
+                )
 
                 if cell.queen:
-                    img = mpimg.imread('img/queen.png')
-                    im = OffsetImage(img, zoom=.2)
-                    ab = AnnotationBbox(im, (cell.col+.5, cell.row+.5), frameon=False, zorder=10)
+                    img = mpimg.imread("img/queen.png")
+                    im = OffsetImage(img, zoom=0.2)
+                    ab = AnnotationBbox(
+                        im, (cell.col + 0.5, cell.row + 0.5), frameon=False, zorder=10
+                    )
                     ax.add_artist(ab)
 
                 elif with_cell_status:
                     if cell.busy:
-                        ax.text(cell.col+.5, cell.row+.5, f"{cell.busy}", ha='center', va='center', color='black', backgroundcolor='white')
+                        ax.text(
+                            cell.col + 0.5,
+                            cell.row + 0.5,
+                            f"{cell.busy}",
+                            ha="center",
+                            va="center",
+                            color="black",
+                            backgroundcolor="white",
+                        )
                     if cell.coords in self.excluded_cells:
-                        ax.text(cell.col+.5, cell.row+.5, "Ex.", ha='center', va='center', color='black', backgroundcolor='white')
+                        ax.text(
+                            cell.col + 0.5,
+                            cell.row + 0.5,
+                            "Ex.",
+                            ha="center",
+                            va="center",
+                            color="black",
+                            backgroundcolor="white",
+                        )
 
         # Plot hard lines between cells
-        for r in range(self.Nrows-1):
+        for r in range(self.Nrows - 1):
             for c in range(self.Ncols):
-                if self.get_cell(r, c).color != self.get_cell(r+1, c).color:
-                    ax.plot([c, c+1], [r+1, r+1], color='black', lw=1.2)
+                if self.get_cell(r, c).color != self.get_cell(r + 1, c).color:
+                    ax.plot([c, c + 1], [r + 1, r + 1], color="black", lw=1.2)
 
-        for c in range(self.Ncols-1):
+        for c in range(self.Ncols - 1):
             for r in range(self.Nrows):
-                if self.get_cell(r, c).color != self.get_cell(r, c+1).color:
-                    ax.plot([c+1, c+1], [r, r+1], color='black', lw=1.2)
+                if self.get_cell(r, c).color != self.get_cell(r, c + 1).color:
+                    ax.plot([c + 1, c + 1], [r, r + 1], color="black", lw=1.2)
 
         ax.set_xlim(0, self.Ncols)
         ax.set_ylim(0, self.Nrows)
         # ax.set_aspect('equal')
-        _ = ax.axis('off')
+        _ = ax.axis("off")
 
-        fig.patch.set_facecolor('black')
+        fig.patch.set_facecolor("black")
 
         fig.gca().invert_yaxis()
 
         if with_cell_status:
             output = output.replace(".png", "_status.png")
 
-        fig.savefig(output, bbox_inches='tight')
+        fig.savefig(output, bbox_inches="tight")
         print(f"Board saved as {output}")
 
     def get_cell(self, row, col):
@@ -263,10 +305,18 @@ class Board:
             for color in self.colors:
                 if free_per_color[color] == 0:
                     free_per_color.pop(color)
-        if order=="asc":
-            return {k: v for k, v in sorted(free_per_color.items(), key=lambda item: item[1])}
-        elif order=="desc":
-            return {k: v for k, v in sorted(free_per_color.items(), key=lambda item: item[1], reverse=True)}
+        if order == "asc":
+            return {
+                k: v
+                for k, v in sorted(free_per_color.items(), key=lambda item: item[1])
+            }
+        elif order == "desc":
+            return {
+                k: v
+                for k, v in sorted(
+                    free_per_color.items(), key=lambda item: item[1], reverse=True
+                )
+            }
         return free_per_color
 
     def get_smallest_color(self):
@@ -286,7 +336,10 @@ class Board:
         return None
 
     def is_solvable(self):
-        if len(self.count_free_per_color(remove_empty=True)) + self.count_queens() < self.Ncols:
+        if (
+            len(self.count_free_per_color(remove_empty=True)) + self.count_queens()
+            < self.Ncols
+        ):
             return False
         return True
 
@@ -298,7 +351,6 @@ class Board:
     def add_to_color_history(self, color):
         if color not in self.color_history:
             self.color_history.append(color)
-
 
     def solve(self, Ql=None, verbose=False):
         if verbose:
@@ -314,7 +366,9 @@ class Board:
             if verbose:
                 print("Try to add another queen")
             color = self.get_smallest_color()
-            cell = self.get_cells_color(color, only_free=True, remove_excluded_cells=True)[0]
+            cell = self.get_cells_color(
+                color, only_free=True, remove_excluded_cells=True
+            )[0]
             if verbose:
                 print(f"Color: {color}")
                 print(f"Cell: {cell}")
@@ -332,7 +386,14 @@ class Board:
             if verbose:
                 print(f"Excluded cells update: {self.excluded_cells}")
 
-            if len(self.get_cells_color(Ql.color, only_free=True, remove_excluded_cells=True)) == 0:
+            if (
+                len(
+                    self.get_cells_color(
+                        Ql.color, only_free=True, remove_excluded_cells=True
+                    )
+                )
+                == 0
+            ):
                 if verbose:
                     print(f"No more free cells for color {Ql.color}")
                 for case in self.get_cells_color(Ql.color):

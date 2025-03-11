@@ -8,7 +8,7 @@ Ncols = Nrows
 # gameID = '250310x7'
 # gameID = '250309x11'
 # gameID = '250402x11'
-gameID = '250310x11'
+gameID = "250310x11"
 
 output = f"plots/{gameID}.png"
 
@@ -25,7 +25,7 @@ board.solve(verbose=True)
 # board.print_board_cells()
 board.print_queens()
 
-output = output.replace('.png', '_solved.png')
+output = output.replace(".png", "_solved.png")
 
 board.plot_board(output=output)
 board.plot_board(output=output, with_cell_status=True)
