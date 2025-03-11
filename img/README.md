@@ -1,0 +1,1 @@
+Queen logo from lichess.org
