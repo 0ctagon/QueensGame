@@ -325,6 +325,12 @@ class Board:
             return None
         return list(free_per_color.keys())[0]
 
+    def is_color_solvable(self, color):
+        cells = self.get_cells_color(color, only_free=True, remove_excluded_cells=True)
+        if len(cells) == 0:
+            return False
+        return True
+
     def get_queen(self, row, col):
         return self.get_cell(row, col).queen
 
@@ -386,14 +392,7 @@ class Board:
             if verbose:
                 print(f"Excluded cells update: {self.excluded_cells}")
 
-            if (
-                len(
-                    self.get_cells_color(
-                        Ql.color, only_free=True, remove_excluded_cells=True
-                    )
-                )
-                == 0
-            ):
+            if not self.is_color_solvable(Ql.color):
                 if verbose:
                     print(f"No more free cells for color {Ql.color}")
                 for case in self.get_cells_color(Ql.color):
