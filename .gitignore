@@ -2,6 +2,7 @@
 test/
 plots/
 board_state.yaml
+misc/
 
 
 # Byte-compiled / optimized / DLL files
