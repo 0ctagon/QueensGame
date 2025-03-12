@@ -125,14 +125,13 @@ class Board:
 
         if seed is None:
             seed_rng = np.random.default_rng()
-            seed = seed_rng.integers(0, 2**32)
-            self.seed = seed
+            self.seed = seed_rng.integers(0, 2**32)
         else:
             self.seed = seed
 
         rng = np.random.default_rng(self.seed)
 
-        print(f"Gnerating board with seed {self.seed}")
+        print(f"Generating board with seed {self.seed}")
 
         rng.shuffle(colors)
 
